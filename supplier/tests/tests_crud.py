@@ -1,7 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Supplier, Factory, RetailNetwork, IndividualEntrepreneur
-from .serializers import (
+from supplier.models import Supplier, Factory, RetailNetwork, IndividualEntrepreneur
+from supplier.serializers import (
     SupplierSerializer,
     FactorySerializer,
     RetailNetworkSerializer,
