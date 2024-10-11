@@ -1,16 +1,15 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from supplier.models import Supplier, Factory, RetailNetwork, IndividualEntrepreneur
-from supplier.serializers import (
-    SupplierSerializer,
-    FactorySerializer,
-    RetailNetworkSerializer,
-    IndividualEntrepreneurSerializer,
-)
+
+from users.models import User
 
 
 class SupplierAPITestCase(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+
         self.supplier = Supplier.objects.create(name="Test Supplier")
         self.factory = Factory.objects.create(
             name="Test Factory", supplier=self.supplier
@@ -54,6 +53,9 @@ class SupplierAPITestCase(APITestCase):
 
 class FactoryAPITestCase(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+
         self.supplier = Supplier.objects.create(name="Test Supplier")
         self.factory = Factory.objects.create(
             name="Test Factory", supplier=self.supplier
@@ -91,6 +93,9 @@ class FactoryAPITestCase(APITestCase):
 
 class RetailNetworkAPITestCase(APITestCase):
     def setUp(self):
+        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.client.force_authenticate(user=self.user)
+
         self.supplier = Supplier.objects.create(name="Test Supplier")
         self.retail_network = RetailNetwork.objects.create(
             name="Test Retail Network", supplier=self.supplier
