@@ -1,56 +1,133 @@
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from datetime import datetime
 
-NULLABLE = {'null': True, 'blank': True}
+NULLABLE = {"null": True, "blank": True}
+
 
 class Contacts(models.Model):
-    email = models.CharField(max_length=50)
-    country = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    street = models.CharField(max_length=100)
-    house_number = models.CharField(max_length=10)
+    """
+    Модель контактов.
+    Хранит информацию о контактах поставщика.
+    """
+
+    email = models.EmailField(max_length=50, verbose_name="Электронная почта")
+    country = models.CharField(max_length=100, verbose_name="Страна")
+    city = models.CharField(max_length=100, verbose_name="Город")
+    street = models.CharField(max_length=100, verbose_name="Улица")
+    house_number = models.CharField(max_length=10, verbose_name="Номер дома")
 
     def __str__(self):
         return f"{self.country}, {self.city}, {self.street}, {self.house_number}"
 
+    class Meta:
+        verbose_name = "Контакты"
+        verbose_name_plural = "Контакты"
+
+
 class Product(models.Model):
-    name = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-    release_date = models.DateField()
+    """
+    Модель продукта.
+    Хранит информацию о продуктах, которые поставляет поставщик.
+    """
+
+    name = models.CharField(max_length=100, verbose_name="Название")
+    model = models.CharField(max_length=100, verbose_name="Модель")
+    release_date = models.DateField(verbose_name="Дата выхода на рынок")
 
     def __str__(self):
         return f"{self.name} ({self.model})"
 
+    class Meta:
+        verbose_name = "Продукт"
+        verbose_name_plural = "Продукты"
+
+
 class Supplier(models.Model):
+    """
+    Модель поставщика.
+    Хранит информацию о поставщике и его контактах.
+    Описана не абстрактно на случай, если поставщик не может быть отнесён к классам потомков.
+    """
+
     name = models.CharField(max_length=100)
-    email = models.EmailField()
-    contacts = models.OneToOneField(Contacts, on_delete=models.CASCADE)
-    products = models.ManyToManyField(Product)
-    supplier = models.ForeignKey('self', on_delete=models.CASCADE, **NULLABLE, related_name='children')
-    debt = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    contacts = models.OneToOneField(
+        Contacts,
+        on_delete=models.CASCADE,
+        **NULLABLE,
+        related_name="supplier_contacts",
+        verbose_name="Контакты",
+    )
+    products = models.ManyToManyField(
+        Product, verbose_name="Продукты", blank=True, related_name="supplier_products"
+    )
+    parent = models.ForeignKey("self", on_delete=models.CASCADE, **NULLABLE, verbose_name="Поставщик")
+    debt = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0, verbose_name="Задолженность (руб.)"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     level = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
 
-@receiver(pre_save, sender=Supplier)
-def set_level(sender, instance, **kwargs):
-    if instance.supplier:
-        instance.level = instance.supplier.level + 1
-    else:
-        instance.level = 0
+    class Meta:
+        verbose_name = "Поставщик"
+        verbose_name_plural = "Поставщики"
+
+
+    @receiver(pre_save, sender='self')
+    def set_level(sender, instance, **kwargs):
+        """
+        Сигнал, который устанавливает уровень поставщика перед сохранением модели.
+
+        :param sender: Модель, которая отправляет сигнал.
+        :param instance: Экземпляр модели Supplier, который сохраняется.
+        :param kwargs: Дополнительные аргументы, которые передаются сигналу.
+        """
+        if instance.parent:
+            instance.level = instance.parent.level + 1
+        else:
+            instance.level = 0
+
 
 class Factory(Supplier):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    """
+    Модель завода.
+    Наследует все поля и методы модели Supplier.
+    """
+
+    def __str__(self):
+        return f"Завод: {self.name}"
+
+    class Meta:
+        verbose_name = "Завод"
+        verbose_name_plural = "Заводы"
+
 
 class RetailNetwork(Supplier):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    """
+    Модель розничной сети.
+    Наследует все поля и методы модели Supplier.
+    """
+
+    def __str__(self):
+        return f"Розничная сеть: {self.name}"
+
+    class Meta:
+        verbose_name = "Розничная сеть"
+        verbose_name_plural = "Розничные сети"
+
 
 class IndividualEntrepreneur(Supplier):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    """
+    Модель индивидуального предприятия.
+    Наследует все поля и методы модели Supplier.
+    """
+
+    def __str__(self):
+        return f"Индивидуальное предприятие: {self.name}"
+
+    class Meta:
+        verbose_name = "Индивидуальное предприятие"
+        verbose_name_plural = "Индивидуальные предприятия"
