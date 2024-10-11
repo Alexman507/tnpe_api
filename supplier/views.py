@@ -4,6 +4,10 @@ from .serializers import FactorySerializer, RetailNetworkSerializer, IndividualE
 
 
 class SupplierViewSet(viewsets.ModelViewSet):
+    """
+    API для управления поставщиками.
+    Поддерживает методы GET, POST, PUT, DELETE.
+    """
     read_only_fields = ('debt',)
 
     def get_queryset(self):
@@ -18,13 +22,22 @@ class SupplierViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
 class FactoryViewSet(SupplierViewSet):
+    """
+    API для управления фабриками.
+    """
     model = Factory
     serializer_class = FactorySerializer
 
 class RetailNetworkViewSet(SupplierViewSet):
+    """
+    API для управления розничными сетями.
+    """
     model = RetailNetwork
     serializer_class = RetailNetworkSerializer
 
 class IndividualEntrepreneurViewSet(SupplierViewSet):
+    """
+    API для управления индивидуальными предпринимателями.
+    """
     model = IndividualEntrepreneur
     serializer_class = IndividualEntrepreneurSerializer
