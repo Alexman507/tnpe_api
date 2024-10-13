@@ -36,7 +36,7 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("suppliers/", include("supplier.urls", namespace="supplier")),
+    path("supplier/", include("supplier.urls", namespace="supplier")),
     path("users/", include("users.urls", namespace="users")),
     path(
         "swagger/",

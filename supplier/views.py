@@ -1,14 +1,27 @@
+from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets
-from .models import Factory, RetailNetwork, IndividualEntrepreneur
-from .serializers import FactorySerializer, RetailNetworkSerializer, IndividualEntrepreneurSerializer
+
+from users.permissions import IsActiveEmployeePermission
+from .serializers import FactorySerializer, RetailNetworkSerializer, IndividualEntrepreneurSerializer, \
+    SupplierSerializer
 
 
+@method_decorator(
+    name="list", decorator=swagger_auto_schema(operation_description="Список поставщиков")
+)
 class SupplierViewSet(viewsets.ModelViewSet):
     """
     API для управления поставщиками.
     Поддерживает методы GET, POST, PUT, DELETE.
     """
+
+    serializer_class = SupplierSerializer
+    permission_classes = [IsActiveEmployeePermission]
     read_only_fields = ('debt',)
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['country']
 
     def get_queryset(self):
         return self.model.objects.all()
@@ -25,19 +38,16 @@ class FactoryViewSet(SupplierViewSet):
     """
     API для управления фабриками.
     """
-    model = Factory
     serializer_class = FactorySerializer
 
 class RetailNetworkViewSet(SupplierViewSet):
     """
     API для управления розничными сетями.
     """
-    model = RetailNetwork
     serializer_class = RetailNetworkSerializer
 
 class IndividualEntrepreneurViewSet(SupplierViewSet):
     """
     API для управления индивидуальными предпринимателями.
     """
-    model = IndividualEntrepreneur
     serializer_class = IndividualEntrepreneurSerializer

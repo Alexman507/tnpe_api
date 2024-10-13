@@ -1,9 +1,11 @@
 from django.contrib import admin
-from .models import Supplier, Factory, RetailNetwork, IndividualEntrepreneur
+from .models import Supplier, Factory, RetailNetwork, IndividualEntrepreneur, Product, Contacts
 
+
+@admin.register(Supplier)
 class SupplierAdmin(admin.ModelAdmin):
-    list_display = ('name', 'debt', 'supplier')
-    list_filter = ('name', "contacts.city")
+    list_display = ('name', 'debt', 'parent', 'level')
+    list_filter = ('name', "contacts__city")
     actions = ['clear_debt']
     def clear_debt(self, request, queryset):
         for obj in queryset:
@@ -12,15 +14,22 @@ class SupplierAdmin(admin.ModelAdmin):
 
     clear_debt.short_description = 'Очистить задолженность'
 
+@admin.register(Factory)
 class FactoryAdmin(SupplierAdmin):
     pass
 
+@admin.register(RetailNetwork)
 class RetailNetworkAdmin(SupplierAdmin):
     pass
 
+@admin.register(IndividualEntrepreneur)
 class IndividualEntrepreneurAdmin(SupplierAdmin):
     pass
 
-admin.site.register(Factory, FactoryAdmin)
-admin.site.register(RetailNetwork, RetailNetworkAdmin)
-admin.site.register(IndividualEntrepreneur, IndividualEntrepreneurAdmin)
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'model', 'release_date')
+
+@admin.register(Contacts)
+class ContactsAdmin(admin.ModelAdmin):
+    list_display = ('country', 'city', 'street', 'house_number')

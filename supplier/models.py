@@ -75,20 +75,12 @@ class Supplier(models.Model):
         verbose_name = "Поставщик"
         verbose_name_plural = "Поставщики"
 
-
-    @receiver(pre_save, sender='self')
-    def set_level(sender, instance, **kwargs):
-        """
-        Сигнал, который устанавливает уровень поставщика перед сохранением модели.
-
-        :param sender: Модель, которая отправляет сигнал.
-        :param instance: Экземпляр модели Supplier, который сохраняется.
-        :param kwargs: Дополнительные аргументы, которые передаются сигналу.
-        """
-        if instance.parent:
-            instance.level = instance.parent.level + 1
+    def save(self, *args, **kwargs):
+        if self.parent:
+            self.level = self.parent.level + 1
         else:
-            instance.level = 0
+            self.level = 0
+        super().save(*args, **kwargs)
 
 
 class Factory(Supplier):

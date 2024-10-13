@@ -5,14 +5,10 @@ NULLABLE = {"null": True, "blank": True}
 
 
 class User(AbstractUser):
-    username = None
+    username = models.CharField(max_length=150, **NULLABLE, verbose_name="Имя пользователя")
     email = models.EmailField(unique=True, verbose_name="email")
     avatar = models.ImageField(
         upload_to="users/avatars", verbose_name="Аватар", **NULLABLE
-    )
-
-    tg_chat_id = models.CharField(
-        max_length=50, verbose_name="Телеграм chat-id", **NULLABLE
     )
 
     USERNAME_FIELD = "email"
