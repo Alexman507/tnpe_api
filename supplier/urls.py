@@ -14,7 +14,7 @@ app_name = SupplierConfig.name
 
 router = routers.DefaultRouter()
 # Registering the viewsets with the router to include them in the API
-router.register(r"supplier", SupplierViewSet, basename="suppliers")
+router.register(r"suppliers", SupplierViewSet, basename="suppliers")
 router.register(r"factories", FactoryViewSet, basename="factories")
 router.register(r"retail", RetailNetworkViewSet, basename="retail")
 router.register(r"individual", IndividualEntrepreneurViewSet, basename="individual")
