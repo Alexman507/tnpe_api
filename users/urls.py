@@ -11,7 +11,7 @@ router.register("", UserViewSet, basename="users")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("register/", CustomRegisterView.as_view(), name='rest_register'),
+    path("user/register/", CustomRegisterView.as_view(), name="rest_register"),
     path("login/", LoginView.as_view(), name="rest_login"),
     path("logout/", LogoutView.as_view(), name="rest_logout"),
 ]

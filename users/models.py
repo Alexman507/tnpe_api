@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.template.defaultfilters import default, slugify
 
 NULLABLE = {"null": True, "blank": True}
 
@@ -10,6 +11,7 @@ class User(AbstractUser):
     avatar = models.ImageField(
         upload_to="users/avatars", verbose_name="Аватар", **NULLABLE
     )
+    is_active = models.BooleanField(default=False, verbose_name="Активен")
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
@@ -20,4 +22,3 @@ class User(AbstractUser):
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
-
